@@ -1,7 +1,7 @@
 let modulename = "pause-tweaks";
 
 function FindChild(child) {
-	let pausechildren = document.getElementById("pause").children
+	let pausechildren = document.getElementById("pause").children[0].children
 	for (let i=0; i < pausechildren.length; i++) {
 		if (pausechildren[i].localName == child) {
 			return pausechildren[i];
@@ -161,7 +161,7 @@ function ready() {
 		hint: game.i18n.localize("pausetweaks.settings.nospin.hint"),
 		scope: "world",
 		config: true,
-		default: false,
+		default: game.system.id == "dnd5e" ? true : false,
 		type: Boolean,
 		onChange: (value) => {
 			updateSpin(value)
@@ -209,7 +209,7 @@ function ready() {
         hint: game.i18n.localize("pausetweaks.settings.img.hint"),
         scope: "world",
         config: true,
-		default: "ui/pause.svg",
+		default: game.system.id == "dnd5e" ? "systems/dnd5e/ui/official/ampersand.svg" : "ui/pause.svg",
         type: String,
 		filePicker: 'imagevideo',
         onChange: (value) => {
