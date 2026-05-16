@@ -9,12 +9,12 @@
   ],
   "url": "https://github.com/MiniGrief/pause-tweaks",
   "manifest": "https://github.com/MiniGrief/pause-tweaks/releases/latest/download/module.json",
-  "download": "https://github.com/MiniGrief/pause-tweaks/releases/download/v1.0.3/pause-tweaks.zip",
+  "download": "https://github.com/MiniGrief/pause-tweaks/releases/download/v1.0.4/pause-tweaks.zip",
   "bugs": "https://github.com/MiniGrief/pause-tweaks/issues",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "compatibility": {
-    "minimum": "13",
-    "verified": "13.344"
+    "minimum": "14",
+    "verified": "14.361"
   },
   "esmodules": [
 	"scripts/pause-tweaks.mjs"
