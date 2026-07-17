@@ -217,26 +217,16 @@ function ready() {
         }
     });
 	
-	applyAll();
-
-	// Foundry v13+ re-renders the GamePause ApplicationV2 every time the pause
-	// state toggles (_replaceHTML -> replaceChildren rebuilds img + figcaption),
-	// which discards the tweaks applied above. Re-apply them on every render so
-	// they persist past the first pause.
-	Hooks.on("renderGamePause", applyAll);
-}
-
-function applyAll() {
 	setupSpin();
 	updateHeight(game.settings.get(modulename, 'pause-height'));
 	updateScale(game.settings.get(modulename, 'pause-scale'));
 	updateSpinSpeed(game.settings.get(modulename, 'pause-spinspeed'));
 	updateBGSize(game.settings.get(modulename, 'pause-smallerbg'));
 	updateSpin(game.settings.get(modulename, 'pause-nospin'));
-	updateSpinDirection(game.settings.get(modulename, 'pause-spindirection'));
 	updateText(game.settings.get(modulename, 'pause-text'));
 	updateImg(game.settings.get(modulename, 'pause-img'));
 	updatePulse(game.settings.get(modulename, 'pause-pulse'));
+	
 }
-
+	
 Hooks.on("ready", ready);
