@@ -24,5 +24,8 @@
 	"pausetweaks.settings.text.hint": "Allows you to customise the displayed text. (Default: Game Paused)",
 	
 	"pausetweaks.settings.img.name": "Paused Image",
-	"pausetweaks.settings.img.hint": "Allows you to customise the displayed image. (Default: ui/pause.svg)"
+	"pausetweaks.settings.img.hint": "Allows you to customise the displayed image. (Default: ui/pause.svg)",
+
+	"pausetweaks.settings.dnd5e.name": "DND5e Styling",
+	"pausetweaks.settings.dnd5e.hint": "Applies the styling used in the DND5e system for feature parity."
 }
