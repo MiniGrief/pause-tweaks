@@ -1,23 +1,5 @@
 let modulename = "pause-tweaks";
 
-function FindChild(child) {
-	let pausechildren = document.getElementById("pause").children[0].children
-	for (let i=0; i < pausechildren.length; i++) {
-		if (pausechildren[i].localName == child) {
-			return pausechildren[i];
-		}
-	}
-}
-
-function setupSpin() {
-	let img = FindChild("img")
-	
-	if (img != null) {
-		img.classList.remove("fa-spin")
-		img.classList.add("pausetweaks-spin")
-	}
-}
-
 function updateHeight(height) {
 	if (game.settings.get(modulename, 'pause-smallerbg')) {
 		$('#pause').css('top', `calc(${height}vh - 85px)`)
@@ -44,55 +26,7 @@ function updateBGSize(toggle) {
 	}
 }
 
-function updateSpin(toggle) {
-	let img = FindChild("img")
-	let className = "pausetweaks-spin"
-	
-	if (img != null) {
-		if (toggle && img.classList.contains(className)) {
-			img.classList.remove(className)
-		} else if (!toggle && !img.classList.contains(className)) {
-			img.classList.add(className)
-		}
-	}
-}
-
-function updateSpinDirection(toggle) {
-	if (toggle) {
-		$('.pausetweaks-spin').css('animation-direction', 'reverse')
-	} else {
-		$('.pausetweaks-spin').css('animation-direction', 'normal')
-	}
-}
-
-function updateSpinSpeed(time) {
-	let img = FindChild("img")
-	
-	if (img != null) {
-		img.style.animationDuration = (time/10).toString()+'s'
-	}
-}
-
-function updatePulse(toggle) {
-	if (toggle) {
-		$('#pause.paused').css('animation', 'disabled')
-	} else {
-		$('#pause.paused').css('animation', 'pulse 3s ease-in-out infinite')
-	}
-}
-
-function updateText(text) {
-	FindChild("figcaption").innerHTML = text;
-}
-
-function updateImg(image) {
-	let img = FindChild("img")
-	if (img != null) {
-		img.src = image;
-	}
-}
-
-function ready() {
+function init() {
 	game.settings.register(modulename, "pause-height", {
 		name: game.i18n.localize("pausetweaks.settings.height.name"),
 		hint: game.i18n.localize("pausetweaks.settings.height.hint"),
@@ -104,10 +38,7 @@ function ready() {
 			step: 1,
 		},
 		default: 50,
-		type: Number,
-		onChange: (value) => {
-			updateHeight(value);
-		}
+		type: Number
 	});
 	
 	game.settings.register(modulename, "pause-scale", {
@@ -121,10 +52,7 @@ function ready() {
 			step: 1,
 		},
 		default: 100,
-		type: Number,
-		onChange: (value) => {
-			updateScale(value);
-		}
+		type: Number
 	});
 	
 	game.settings.register(modulename, "pause-spinspeed", {
@@ -138,10 +66,7 @@ function ready() {
 			step: 1,
 		},
 		default: 50,
-		type: Number,
-		onChange: (value) => {
-			updateSpinSpeed(value);
-		}
+		type: Number
 	});
 	
 	game.settings.register(modulename, "pause-smallerbg", {
@@ -150,10 +75,7 @@ function ready() {
 		scope: "world",
 		config: true,
 		default: false,
-		type: Boolean,
-		onChange: (value) => {
-			updateBGSize(value)
-        }
+		type: Boolean
 	});
 	
 	game.settings.register(modulename, "pause-nospin", {
@@ -162,10 +84,7 @@ function ready() {
 		scope: "world",
 		config: true,
 		default: game.system.id == "dnd5e" ? true : false,
-		type: Boolean,
-		onChange: (value) => {
-			updateSpin(value)
-        }
+		type: Boolean
 	});
 	
 	game.settings.register(modulename, "pause-spindirection", {
@@ -174,10 +93,7 @@ function ready() {
 		scope: "world",
 		config: true,
 		default: false,
-		type: Boolean,
-		onChange: (value) => {
-			updateSpinDirection(value)
-        }
+		type: Boolean
 	});
 	
 	game.settings.register(modulename, "pause-pulse", {
@@ -186,10 +102,7 @@ function ready() {
 		scope: "world",
 		config: true,
 		default: false,
-		type: Boolean,
-		onChange: (value) => {
-			updatePulse(value)
-        }
+		type: Boolean
 	});
 	
 	game.settings.register(modulename, "pause-text", {
@@ -198,10 +111,7 @@ function ready() {
         scope: "world",
         config: true,
 		default: "Game Paused",
-        type: String,
-        onChange: (value) => {
-			updateText(value);
-        }
+        type: String
     });
 	
 	game.settings.register(modulename, "pause-img", {
@@ -211,22 +121,78 @@ function ready() {
         config: true,
 		default: game.system.id == "dnd5e" ? "systems/dnd5e/ui/official/ampersand.svg" : "ui/pause.svg",
         type: String,
-		filePicker: 'imagevideo',
-        onChange: (value) => {
-			updateImg(value);
-        }
+		filePicker: 'imagevideo'
     });
-	
-	setupSpin();
+
+	if (game.system.id == "dnd5e") {
+		game.settings.register(modulename, "pause-dnd5e", {
+			name: game.i18n.localize("pausetweaks.settings.dnd5e.name"),
+			hint: game.i18n.localize("pausetweaks.settings.dnd5e.hint"),
+			scope: "world",
+			config: true,
+			default: false,
+			type: Boolean,
+			requiresReload: true
+		});
+	}
+}
+
+function renderGamePause(app, html) {
+	if (game.system.id == "dnd5e" && game.settings.get(modulename, 'pause-dnd5e')) {
+		// Copied from the dnd5e system.
+		// https://github.com/foundryvtt/dnd5e/blob/0f782c79a467b0ee6363f03bd9c6fb620a177d19/dnd5e.mjs#L610
+		// As far as I'm aware this should be fine as I use the MIT license as well. Please open an issue if this is not acceptable.
+		html.classList.add("dnd5e2");
+		const container = document.createElement("div");
+		container.classList.add("flexcol");
+		container.append(...html.children);
+		html.append(container);
+	}
+
+	//Find what we'll be changing
+	let img = html.querySelector("img")
+	let txt = html.querySelector("figcaption")
+	let className = "pausetweaks-spin"
+
+	//Setup Spin
+	img.classList.remove("fa-spin")
+	img.classList.add(className)
+
+	//Old Functions, why change what isn't broken
 	updateHeight(game.settings.get(modulename, 'pause-height'));
 	updateScale(game.settings.get(modulename, 'pause-scale'));
-	updateSpinSpeed(game.settings.get(modulename, 'pause-spinspeed'));
 	updateBGSize(game.settings.get(modulename, 'pause-smallerbg'));
-	updateSpin(game.settings.get(modulename, 'pause-nospin'));
-	updateText(game.settings.get(modulename, 'pause-text'));
-	updateImg(game.settings.get(modulename, 'pause-img'));
-	updatePulse(game.settings.get(modulename, 'pause-pulse'));
-	
+
+	//Update Spin
+	if (game.settings.get(modulename, 'pause-nospin')) {
+		img.classList.remove(className)
+	} else {
+		img.classList.add(className)
+	}
+
+	//Spin Direction
+	if (game.settings.get(modulename, 'pause-spindirection')) {
+		$('.pausetweaks-spin').css('animation-direction', 'reverse')
+	} else {
+		$('.pausetweaks-spin').css('animation-direction', 'normal')
+	}
+
+	//Spin Speed
+	img.style.animationDuration = (game.settings.get(modulename, 'pause-spinspeed')/10).toString()+'s'
+
+	//Pulse Animation
+	if (game.settings.get(modulename, 'pause-pulse')) {
+		$('#pause.paused').css('animation', 'disabled')
+	} else {
+		$('#pause.paused').css('animation', 'pulse 3s ease-in-out infinite')
+	}
+
+	//Apply Text
+	txt.innerHTML = game.settings.get(modulename, 'pause-text');
+
+	//Apply Image
+	img.src = game.settings.get(modulename, 'pause-img');
 }
-	
-Hooks.on("ready", ready);
+
+Hooks.on("init", init);
+Hooks.on("renderGamePause", renderGamePause);
